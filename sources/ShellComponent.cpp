@@ -50,14 +50,13 @@ void Susi::ShellComponent::handleExec(std::string command, std::string &stdin,
                                       std::string &stdout, std::string &stderr,
                                       int &status) {
   std::cout << "executing command: " << command << std::endl;
-  Process proc("bash", "",
-               [&stdout](const char *bytes, size_t n) {
-                 stdout += std::string(bytes, n);
-               },
-               [&stderr](const char *bytes, size_t n) {
-                 stderr += std::string(bytes, n);
-               },
-               true);
+  std::string *out = &stdout;
+  std::string *err = &stderr;
+  Process proc(
+      "bash", "",
+      [out](const char *bytes, size_t n) { *out += std::string(bytes, n); },
+      [err](const char *bytes, size_t n) { *err += std::string(bytes, n); },
+      true);
   proc.write(command + "\n");
   proc.write(stdin);
   proc.close_stdin();
